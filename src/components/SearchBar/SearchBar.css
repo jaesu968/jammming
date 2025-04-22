@@ -1,1 +1,42 @@
 /*Styling for the Search Bar component*/
+.SearchBar {
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    padding-top: 5rem; 
+    margin-bottom: 2.5rem; 
+}
+/* Styling for the SearchBar input field */
+.SearchBar input {
+    width: 150px;  
+    padding: 0.5rem; 
+    border: 1px dotted #fff; 
+    border-radius: 3px; 
+    margin-bottom: 1.5rem; 
+    color: #000000; 
+    text-align: center; 
+    font-size: 1rem; 
+}
+/* stylying for search bar input field when focused */
+.SearchBar input:focus {
+    outline: none;
+}
+/* Styling for the Searchbar button itself */ 
+.SearchButton {
+    cursor: pointer; 
+    width: 8.11rem; 
+    padding: .77rem 0; /* add padding to the top and bottom of the button */ 
+    border-radius: 54px; 
+    background-color: #61dafb; 
+    text-align: center; 
+    font-size: .833rem; 
+    transition: background-color 0.25s; 
+    border: 0px; 
+    color: #282c34; 
+    font-weight: 500; 
+}
+
+/* styling for the search button when hovered */
+.SearchButton:hover {
+    background-color: #43d797;
+}

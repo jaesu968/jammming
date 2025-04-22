@@ -1,0 +1,9 @@
+/* Styling for the Search Results */
+.SearchResults {
+    display: flex; 
+    flex-direction: column; 
+    width: 60%; 
+    margin: 0 0 2.5 0 ; /* top right bottom left*/
+    padding: 0.92rem;
+    background-color: #e9e932
+} 
