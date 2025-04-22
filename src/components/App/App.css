@@ -1,39 +1,48 @@
 /* Styling for the App component */
-.App {
-  text-align: center;
+/* body, html and #root are set to 100% of the viewport height */
+body, 
+html, 
+#root {
+  height: 100%;
+  margin: 0; /* Removes default margin */
+  padding: 0; /* Removes default padding */
+  overflow-x: hidden; /* Prevents horizontal scrolling */
 }
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Ensures the app takes up the full height of the viewport */
+html {
+  font-size: 18px; /* Base font size */
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
+/* set up the H1 element */ 
+h1 {
+  padding: .77rem 0; 
   background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  text-align: center; 
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.88rem; 
+  color: #fff; 
+  margin: 0; /* Removes default margin */
 }
 
-.App-link {
-  color: #61dafb;
+h1 .highlight {
+  color: #61dafb
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.App {
+  height: 100%; 
+  width: 100%; 
+  margin: 0; /* Removes default margin */
+  padding: 0; /* Removes default padding */
+  min-height: 100vh; /* Ensures the app takes up the full height of the viewport */
+  text-align: center;
+  background-image: url('FireflyForestStereo.jpg');
+  background-size: cover; 
+  background-position: center;
+  background-repeat: no-repeat; 
+  background-attachment: fixed; /* Makes the background image fixed */
+  display: flex; 
+  flex-direction: column; 
 }
+
+
+
+

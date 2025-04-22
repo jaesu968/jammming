@@ -1,15 +1,19 @@
 // this component is what is used to display the app in the browser
-import logo from '../../logo.svg';
-import './App.css';
 import React from 'react';
+import './App.css';
+
 
 
 function App() {
   return (
+    <div>
+    <h1>
+      Ja<span className="highlight">mmm</span>ing
+    </h1>
     <div className="App">
-      <header className="App-header">
-        <h1>Jammming</h1>
-      </header>
+      
+      </div> 
+      <footer>Background Image comes from Adobe Firefly AI Image Generation</footer>
     </div>
   );
 }
