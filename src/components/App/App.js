@@ -1,5 +1,5 @@
+// this component is what is used to display the app in the browser
 import logo from '../../logo.svg';
-import musicIcon from './FireflyMusicIconLogo.jpg';
 import './App.css';
 import React from 'react';
 
@@ -8,19 +8,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Hello React!
-          <img src={musicIcon} alt="Firefly Music Logo" />
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <h1>Jammming</h1>
       </header>
     </div>
   );
