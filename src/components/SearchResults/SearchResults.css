@@ -2,8 +2,11 @@
 .SearchResults {
     display: flex; 
     flex-direction: column; 
-    width: 60%; 
-    margin: 0 0 2.5 0 ; /* top right bottom left*/
+    width: 50%; /* 50% of the parent container */
+    height: 950px; /* height of the container */
     padding: 0.92rem;
-    background-color: #e9e932
+    background-color: #e9e932;
+    box-shadow: 0 4px 2px 2px #000000; /* top left right bottom */
 } 
+
+/* Styling for the SearchResults header */

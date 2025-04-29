@@ -15,7 +15,7 @@ const generateRandomString = (length) => {
 }
 
 var client_id = '5fc8733a17574f7a843cc4179ba48f1b'; // your client id 
-var redirect_uri = 'http://localhost:3000//callback';
+var redirect_uri = 'http://127.0.0.1:3000'; // your redirect uri
 let accessToken; // global variable to store the access token
 
 // generate a random string to be used as the state parameter
@@ -24,7 +24,7 @@ var state = generateRandomString(16);
 // function to generate a random string of a given length
 localStorage.setItem(stateKey, state);
 // set the scope of the API call to read the user's private information
-var scope = 'user-read-private user-read-email';
+var scope = 'user-read-private user-read-email playlist-modify-public'; 
 // build the URL for the API call
 var url = 'https://accounts.spotify.com/authorize';
 url += '?response_type=token';
@@ -54,8 +54,7 @@ const Spotify = {
             return accessToken; // return the access token
         } else {
             // if the access token is not in the URL, redirect the user to the Spotify authorization page
-            const accessUrl = url // set the URL to the Spotify authorization page
-            window.location = accessUrl; // redirect the user to the Spotify authorization page
+            window.location = url; // redirect the user to the Spotify authorization page
         }
     }, // end of getAccessToken function 
 
@@ -63,13 +62,17 @@ const Spotify = {
     // the term parameter is the search term the user enters in the search bar 
     search (term) { 
         const accessToken = Spotify.getAccessToken(); // get the access token , used to make API calls to the Spotify API
-        return fetch('https://api.spotify.com/v1/search?type=track&q=${term}',{
+        console.log(accessToken); // see if the access token is working
+
+        return fetch(`https://api.spotify.com/v1/search?type=track&q=${term}`,{
             headers: { // set the headers for the API call 
                 Authorization: `Bearer ${accessToken}` // set the authorization header to the access token} 
             }
         }).then(response => { // make the API call to the Spotify API
+            console.log('API response:', response); // log the response from the API call
             return response.json(); // return the response as a JSON object
         }).then(jsonResponse => { // parse the JSON response})
+            console.log('JSON response:', jsonResponse); // log the JSON response from the API call
             if (!jsonResponse.tracks) { // check if the response contains tracks
                 return []; // if not, return an empty array 
             }

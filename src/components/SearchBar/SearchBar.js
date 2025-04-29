@@ -15,6 +15,7 @@ const SearchBar = (props) => {
 
     // define the search funciton 
     const search = useCallback(() => {
+        console.log('Search term: ' + term); // log the search term (see if search is working)
         props.onSearch(term); // call the onSearch function passed from the parent component
     }, [props.onSearch, term]); // dependendcies, so it will run every time the term or onSearch changes)
 

@@ -21,7 +21,10 @@ function App() {
   // define the search function  // this will use a callback function to search for tracks \
   // through the Spotify API 
   const search = useCallback((term) => {
-    Spotify.search(term).then(setSearchResults); // call the search function from the Spotify class and set the search results to the state
+    console.log('Searching for ' + term); // log the search term (see if search is working)
+    Spotify.search(term).then(setSearchResults)
+    .then(() => console.log('Search results: ' + searchResults))
+    .catch(error => console.error('Search error:' + error)); // see what results are returned 
   }, []); // 0 dependencies since the search function is not dependent on any other state
 
   // define the add track function 
