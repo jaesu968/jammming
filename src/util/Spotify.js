@@ -2,6 +2,18 @@
 // Search the API for track information based on search terms 
 // and save the playlist to the user's Spotify account and to the App 
 
+// the statekey is used to store the state of the app
+const stateKey = 'spotify_auth_state'; // the state key is used to store the state of the app
+// generate a random string function 
+const generateRandomString = (length) => {
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; // the possible characters to be used in the random string
+    let text = ''; // the text variable is used to store the random string
+    for (let i = 0; i < length; i++) { // loop through the length of the random string
+        text += possible.charAt(Math.floor(Math.random() * possible.length)); // generate a random character from the possible characters and add it to the text variable
+    }
+    return text; // return the random string
+}
+
 var client_id = '5fc8733a17574f7a843cc4179ba48f1b'; // your client id 
 var redirect_uri = 'http://localhost:3000//callback';
 let accessToken; // global variable to store the access token
@@ -53,10 +65,11 @@ const Spotify = {
         const accessToken = Spotify.getAccessToken(); // get the access token , used to make API calls to the Spotify API
         return fetch('https://api.spotify.com/v1/search?type=track&q=${term}',{
             headers: { // set the headers for the API call 
-                Authorization: 'Bearer ' + accessToken // set the authorization header to the access token} 
+                Authorization: `Bearer ${accessToken}` // set the authorization header to the access token} 
+            }
         }).then(response => { // make the API call to the Spotify API
             return response.json(); // return the response as a JSON object
-        }).then(jsonRespone => { // parse the JSON response})
+        }).then(jsonResponse => { // parse the JSON response})
             if (!jsonResponse.tracks) { // check if the response contains tracks
                 return []; // if not, return an empty array 
             }
@@ -80,11 +93,11 @@ savePlaylist(name, trackUris){
 
     // get the access token again 
     const accessToken = Spotify.getAccessToken(); // get the access token
-    const headers = { Authorization: 'Bearer ' + accessToken }; // set the headers for the API call
+    const headers = { Authorization: `Bearer ${accessToken}` }; // set the headers for the API call
     let userId; // variable to store the user id
     
     // make the API call to the Spotify API to get the user id 
-    return fetch('https://api.spotify.com/v1/me', { headers: headers } // make a call to the Spotify API to get the user's playlist      
+    return fetch('https://api.spotify.com/v1/me', {headers: headers} // make a call to the Spotify API to get the user's playlist      
     ).then(response => response.json() // parse the response as a JSON object)
     ).then(jsonResponse => { // parse the JSON response})
         userId = jsonResponse.id; // set the user id to the user id in the response
@@ -105,4 +118,5 @@ savePlaylist(name, trackUris){
     } 
 }; 
 
-// export the Spotify object 
+// export the Spotify object
+export default Spotify; // export the Spotify object 

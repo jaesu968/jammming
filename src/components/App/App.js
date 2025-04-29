@@ -1,10 +1,11 @@
 // this component is what is used to display the app in the browser
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import './App.css';
 
 import Playlist from '../Playlist/Playlist'; // import the playlist component
 import SearchBar from '../SearchBar/SearchBar'; // import the search bar component
 import SearchResults from '../SearchResults/SearchResults'; // import the search results component 
+import Spotify from '../../util/Spotify'; // import the spotify class
 
 
 function App() {
@@ -17,11 +18,11 @@ function App() {
   // store the state of the playlist tracks 
   // initialize the state with an empty array
   const [playlistTracks, setPlaylistTracks] = useState([]);
-  // define the search function 
-  const search = (term) => {
-    // add search logic here 
-    console.log(term); // log the term to the console
-  }; 
+  // define the search function  // this will use a callback function to search for tracks \
+  // through the Spotify API 
+  const search = useCallback((term) => {
+    Spotify.search(term).then(setSearchResults); // call the search function from the Spotify class and set the search results to the state
+  }, []); // 0 dependencies since the search function is not dependent on any other state
 
   // define the add track function 
   const addTrack = useCallback(
@@ -43,7 +44,7 @@ function App() {
 
   // define an update playlist name function 
   // because people want to create their own playlist names
-  const updatePlaylistName = useeCallback((name) => {
+  const updatePlaylistName = useCallback((name) => {
     setPlaylistName(name); // call back the setPlaylistName function with the new name
   }, []); // no dependencies, as it is only checking for the name to change once a user types in the input field
 
