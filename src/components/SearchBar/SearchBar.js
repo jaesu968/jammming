@@ -1,6 +1,6 @@
 // this compoonent is for the search bar
 // it will incldue  a search button and a search input
-import React, { useCallback, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import './SearchBar.css';
 
 // this is the search bar component
