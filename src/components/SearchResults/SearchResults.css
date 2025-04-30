@@ -1,12 +1,25 @@
 /* Styling for the Search Results */
 .SearchResults {
-    display: flex; 
-    flex-direction: column; 
-    width: 50%; /* 50% of the parent container */
-    height: 950px; /* height of the container */
-    padding: 0.92rem;
-    background-color: #e9e932;
+    width: 50%; 
+    height: 650px; /* height of the container */
+    overflow-y: scroll; /* Enables vertical scrolling */
+    padding: 0.88rem;
+    background-color: #e9e93280;
     box-shadow: 0 4px 2px 2px #000000; /* top left right bottom */
 } 
 
 /* Styling for the SearchResults header */
+/* add custom scrollbar styling */ 
+.SearchResults::-webkit-scrollbar {
+    width: 8px; /* width of the scrollbar */
+}
+
+/* Styling for the scrollbar track */
+.SearchResults::-webkit-scrollbar-track {
+    background: #f1f1f1; /* color of the track */
+}
+/* Styling for the scrollbar thumb */
+.SearchResults::-webkit-scrollbar-thumb {
+    background: #888; /* color of the thumb */
+    border-radius: 4px; /* roundness of the thumb */
+}

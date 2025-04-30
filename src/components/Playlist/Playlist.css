@@ -1,1 +1,57 @@
 /*Styling for the Playlist component*/
+.Playlist {
+    width: 50%; 
+    height: 650px; /* height of the container */
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    overflow-y: scroll; /* Enables vertical scrolling */
+    padding: 0.88rem; 
+    background-color: #e9e93280; /* background color */
+    box-shadow: 0 4px 2px 2px #000000; /* top left right bottom */ 
+}
+
+.Playlist input {
+    width: 100%; 
+    border: 0; /* Removes default border */
+    outline: 0; /* Removes default outline */
+    background: transparent; /* Makes the background transparent */
+    border-bottom: 1px solid #000; /* Adds a bottom border */
+    font-family: 'Poppins', sans-serif; /* Font family */
+    font-size: 1.55rem; /* Font size */
+    color: fff; 
+    padding: 0.88rem; /* Padding */
+}
+/* Styling for the Playlist save button */
+.Playlist-save {
+    cursor: pointer; /* Changes cursor to pointer on hover */
+    width: 10rem; /* Width of the button */
+    padding: 0.77rem 0; /* Padding top and bottom, and left and right */ 
+    border-radius: 54px; /* Rounded corners */
+    border: none; /* Removes default border */
+    margin-top: 1.27rem; 
+    background-color: #61dafb; /* Spotify green color */
+    text-align: center; /* Centers the text */
+    font-size: 0.83rem; /* Font size */
+    transition: background-color 0.25s; /* Transition effect */
+    color: #000000; /* Text color */ 
+    font-weight: 500; /* Font weight */
+}
+
+/* styling for playlist save button on hover */ 
+.Playlist-save:hover {
+    background-color: #43d797; /* Darker green color on hover */
+}
+/* add custom scrollbar styling */ 
+.Playlist::-webkit-scrollbar {
+    width: 8px; /* width of the scrollbar */
+}
+/* Styling for the scrollbar track */
+.Playlist::-webkit-scrollbar-track {
+    background: #f1f1f1; /* color of the track */
+}
+/* Styling for the scrollbar thumb */
+.Playlist::-webkit-scrollbar-thumb {
+    background: #888; /* color of the thumb */
+    border-radius: 4px; /* roundness of the thumb */
+}

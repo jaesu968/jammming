@@ -1,5 +1,5 @@
 // this component is what is used to display the app in the browser
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import './App.css';
 
 import Playlist from '../Playlist/Playlist'; // import the playlist component
@@ -18,6 +18,12 @@ function App() {
   // store the state of the playlist tracks 
   // initialize the state with an empty array
   const [playlistTracks, setPlaylistTracks] = useState([]);
+
+  // useEffect hook to intialize Spotify API when the component mounts
+  useEffect(() => {
+    Spotify.getAccessToken(); // call the getAccessToken function from the Spotify class
+  }, []);
+
   // define the search function  // this will use a callback function to search for tracks \
   // through the Spotify API 
   const search = useCallback((term) => {
@@ -57,6 +63,14 @@ function App() {
   const savePlaylist = useCallback(() => {
     // mock save logic here until API is implemented
     const trackUris = playlistTracks.map((track) => track.uri); // map the playlist tracks to an array of track uris
+    if(playlistName && trackUris.length){
+      Spotify.savePlaylist(playlistName, trackUris)
+      .then(() => {
+        setPlaylistName('New Playlist'); // reset the playlist name
+        setPlaylistTracks([]); // reset the playlist tracks
+      })
+      .catch(error => console.error('Save Playlist error', error)); 
+    }
 
   }, [playlistName, playlistTracks]); // the dependencies are the playlistName and playlistTracks arrays
 

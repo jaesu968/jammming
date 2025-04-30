@@ -8,7 +8,7 @@
 }
 /* Styling for the SearchBar input field */
 .SearchBar input {
-    width: 150px;  
+    width: 360px;  
     padding: 0.5rem; 
     border: 1px dotted #fff; 
     border-radius: 3px; 
@@ -24,7 +24,7 @@
 /* Styling for the Searchbar button itself */ 
 .SearchButton {
     cursor: pointer; 
-    width: 8.11rem; 
+    width: 8rem; 
     padding: .77rem 0; /* add padding to the top and bottom of the button */ 
     border-radius: 54px; 
     background-color: #61dafb; 

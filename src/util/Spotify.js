@@ -38,12 +38,21 @@ const Spotify = {
     async getAccessToken(){
         const urlParams = new URLSearchParams(window.location.search); // get the URL parameters from the current URL
         const code = urlParams.get('code'); // get the code from the URL parameters
+
+        // add token expiration check 
+        const tokenExpirationTime = localStorage.getItem('token_expiration'); // get the token expiration time from the local storage
+        const currentTime = Date.now(); // get the current time
         
 
         // check if the access token is already stored in the local storage
-        if (localStorage.getItem(tokenKey)){
+        // and not expired 
+        if (localStorage.getItem(tokenKey) && tokenExpirationTime && currentTime < parseInt(tokenExpirationTime)){
             return localStorage.getItem(tokenKey); // return the access token from the local storage
         }
+        // clear expired token 
+        localStorage.removeItem(tokenKey); // remove the access token from the local storage
+        localStorage.removeItem('token_expiration'); // remove the token expiration time from the local storage
+
         // check if the code is already stored in the URL parameters
         // if no code is found, redirect the user to Spotify to authorize the app
         if (!code){
@@ -65,6 +74,7 @@ const Spotify = {
         window.location.href = authUrl; // redirect the user to the authorization URL
         return; // return nothing since the user is redirected to Spotify
         } else {
+            try {
             // Step 2:  exchange code for the access token 
             const verifier = localStorage.getItem('code_verifier'); // get the code verifier from the local storage
             // a log check to see if the code verifier was saved properly
@@ -87,33 +97,64 @@ const Spotify = {
             const data = await response.json(); // parse the response as a JSON object
             // check if the response contains an access token
             if (data.access_token) { 
+                // store token with expiration time (typically 1 hour) 
                 localStorage.setItem(tokenKey, data.access_token); // store the access token in the local storage
+                localStorage.setItem('token_expiration', String(Date.now() + 3600000)); // store the token expiration time in the local storage)
                 window.history.replaceState({}, document.title, '/'); // replace the current URL with the root URL
                 return data.access_token; // return the access token
             } else {
                 throw new Error('Failed to get access token'); // throw an error if the response does not contain an access token
             }
+            } catch (error) {
+                console.error('Authorization error:', error); // log the error to the console
+                // clear any existing tokens and redirect to get authorization again
+                localStorage.removeItem(tokenKey); // remove the access token from the local storage
+                localStorage.removeItem('token_expiration'); // remove the token expiration time from the local storage
+                localStorage.removeItem('code_verifier'); // remove the code verifier from the local storage
+                window.location.href = '/'; // redirect the user to the root URL
+                return null; // return null if there is an error
+            }
         }
     },  
     // this function will be used to search for tracks and playlists in the Spotify API
         async search(term){ 
-        const token = await Spotify.getAccessToken(); // get the access token , used to make API calls to the Spotify API
-        if (!token) return []; // if the token is not available, return an empty array
+            // use try catch block to handle errors
+            try {
 
-        // use a try catch block to handle errors
-        try {
+                // check if the serach term is empty 
+                if (!term || term.trim() === ' '){
+                    console.log('Search term is empty'); // log the error to the console
+                    return []; // return an empty array if the search term is empty
+                }
+
+            // log trying to get token 
+            console.log('Trying for access token'); // log the error to the console
+        const token = await Spotify.getAccessToken(); // get the access token , used to make API calls to the Spotify API
+        if (!token){
+            // trigger the authorization flow if no token 
+            console.log('No token available, redirecting to auth...'); 
+            window.location.href = '/'; // redirect the user to the root URL
+            return []; // return an empty array if there is no token
+        }
+        
+        console.log(" making search request to Spotify API"); // log the error to the console
             const response = await fetch(`https://api.spotify.com/v1/search?type=track&q=${encodeURIComponent(term)}`,{
             headers: { // set the headers for the API call 
                 Authorization: `Bearer ${token}` // set the authorization header to the access token} 
             }
         }); 
+        // check if the response status 
         if (!response.ok) {
             throw new Error('Spotify search failed'); // throw an error if the response is not ok
         }
         const jsonResponse = await response.json(); // parse the response as a JSON object
+        console.log('Spotify search successful'); // log the error to the console
 
         // check if the response contains tracks
-        if (!jsonResponse.tracks) return []; // if no tracks are found, return an empty array 
+        if (!jsonResponse.tracks){
+            console.log('No tracks found'); // log the error to the console
+            return []; // return an empty array if there are no tracks
+        } // if no tracks are found, return an empty array 
         // return the tracks and associated data in an array of objects
             return jsonResponse.tracks.items.map(track => ({ // map the tracks to an array of objects   
                 id: track.id, // set the id to the track id
@@ -124,6 +165,9 @@ const Spotify = {
             })); // return the array of objects 
     } catch (error) {
         console.error('Spotify search error:', error); // log the error to the console 
+        if (error.message.includes('Failed to fetch')){
+            console.error('Network error - check your internet connection'); 
+        }
         return []; // return an empty array if an error occurs
     }
 }, // end of search function,
@@ -134,13 +178,17 @@ async savePlaylist(name, trackUris) {
             return;
         }
 
-        const token = await Spotify.getAccessToken();
-        if (!token) return;
+        const token = await Spotify.getAccessToken(); 
+        if (!token) {
+            window.location.href = '/';
+            return; // return if there is no token
+        }
 
         const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
         
         try { 
             const userResponse = await fetch('https://api.spotify.com/v1/me', { headers });
+
             if (!userResponse.ok) throw new Error('Failed to get user info from Spotify');
             const userData = await userResponse.json();
 

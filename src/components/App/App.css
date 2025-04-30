@@ -43,6 +43,13 @@ h1 .highlight {
   flex-direction: column; 
 }
 
+.App-playlist {
+  display: flex; 
+  justify-content: space-between; 
+  width: 100%; 
+  gap: 2rem; 
+}
+
 
 
 
