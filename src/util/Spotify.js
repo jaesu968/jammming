@@ -57,7 +57,7 @@ const Spotify = {
             `&response_type=code` + // set the response type to code
             `&redirect_uri=${encodeURIComponent(redirectUri)}` +
             `&scope=${encodeURIComponent(scope)}` +
-            'code_challenge_method=S256' +
+            `&code_challenge_method=S256` +
             `&code_challenge=${challenge}`; 
         // redirect the user to Spotify with code challenge 
         window.location.href = authUrl; // redirect the user to the authorization URL
@@ -93,7 +93,7 @@ const Spotify = {
     },  
     // this function will be used to search for tracks and playlists in the Spotify API
         async search(term){ 
-        const token = Spotify.getAccessToken(); // get the access token , used to make API calls to the Spotify API
+        const token = await Spotify.getAccessToken(); // get the access token , used to make API calls to the Spotify API
         if (!token) return []; // if the token is not available, return an empty array
 
         // use a try catch block to handle errors
@@ -130,7 +130,7 @@ async savePlaylist(name, trackUris) {
             return;
         }
 
-        const token = Spotify.getAccessToken();
+        const token = await Spotify.getAccessToken();
         if (!token) return;
 
         const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
