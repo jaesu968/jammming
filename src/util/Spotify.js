@@ -51,6 +51,8 @@ const Spotify = {
             const verifier = generateCodeVerifier(); // generate the code verifier
             const challenge = await generateCodeChallenge(verifier); // generate the code challenge
             localStorage.setItem('code_verifier', verifier); // store the code verifier in the local storage
+            // check it was saved properly with logging 
+            console.log("Saving verifier before redirect: ", verifier); // log the code verifier to the console
         // make authorization URL  
         const authUrl = `https://accounts.spotify.com/authorize?` +
             `client_id=${encodeURIComponent(clientId)}` +
@@ -65,6 +67,8 @@ const Spotify = {
         } else {
             // Step 2:  exchange code for the access token 
             const verifier = localStorage.getItem('code_verifier'); // get the code verifier from the local storage
+            // a log check to see if the code verifier was saved properly
+            console.log("Retrieved verifier after redirect: ", verifier); // log the code verifier to the console
             const body = new URLSearchParams({ // create a new URLSearchParams object with the code and code verifier
                 client_id: clientId, // set the client id to the client id
                 grant_type: 'authorization_code', // set the grant type to authorization code

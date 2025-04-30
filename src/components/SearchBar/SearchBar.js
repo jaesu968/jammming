@@ -15,6 +15,11 @@ const SearchBar = (props) => {
 
     // define the search funciton 
     const search = useCallback(() => {
+        // if the term is empty, warn the user and return 
+        if (!term.trim()){
+            console.warn('Search term is empty'); // warn the user 
+            return; // return to avoid calling the onSearch function
+        }
         console.log('Search term: ' + term); // log the search term (see if search is working)
         props.onSearch(term); // call the onSearch function passed from the parent component
     }, [props.onSearch, term]); // dependendcies, so it will run every time the term or onSearch changes)
