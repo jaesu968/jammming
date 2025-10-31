@@ -7,7 +7,7 @@ import './SearchBar.css';
 const SearchBar = (props) => {
     const [term, setTerm] = useState(""); // set it to an empty string 
     // loading state to handle serch in progress
-    const [isSearching, setIsSearching] = useState(false); // set it to false
+    const [isSearching, setIsSearching] = useState(false); // set it to false by default
 
     // handle the change in the input field
     // use callback function to set the term to the value of the input field
