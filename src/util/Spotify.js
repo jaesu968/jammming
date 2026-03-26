@@ -272,6 +272,68 @@ async savePlaylist(name, trackUris) {
             console.error('Spotify playlist tracks error:', error);
             return []; // return an empty array if an error occurs
         }
+    },
+
+    // remove a track from an existing Spotify playlist
+    async removeTrackFromPlaylist(playlistId, trackUri) {
+        const token = await Spotify.getAccessToken();
+        if (!token) {
+            window.location.href = redirectUri;
+            return false;
+        }
+
+        try {
+            const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    tracks: [{ uri: trackUri }]
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to remove track from playlist');
+            }
+
+            return true;
+        } catch (error) {
+            console.error('Spotify remove track error:', error);
+            return false;
+        }
+    },
+
+    // add a track to an existing Spotify playlist
+    async addTrackToPlaylist(playlistId, trackUri) {
+        const token = await Spotify.getAccessToken();
+        if (!token) {
+            window.location.href = redirectUri;
+            return false;
+        }
+
+        try {
+            const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    uris: [trackUri]
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add track to playlist');
+            }
+
+            return true;
+        } catch (error) {
+            console.error('Spotify add track error:', error);
+            return false;
+        }
     }
 }; // closing bracket for Spotify object
 
