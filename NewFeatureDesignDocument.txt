@@ -1,0 +1,124 @@
+New Feature Design Document
+March 26th 2026
+
+OBJECTIVE
+Allow users to view and edit their existing Spotify playlists in Jammming while keeping edits intentional and controlled.
+
+BACKGROUND
+Originally, Jammming only supported creating a brand-new playlist and saving it to Spotify.
+Today, the app supports a second flow: selecting an existing Spotify playlist, staging add/remove track edits locally, and saving those edits only when the user clicks SAVE CHANGES.
+
+IMPLEMENTED FEATURE SUMMARY
+This feature now accomplishes the following:
+- Displays a list of the current user's playlists.
+- Allows the user to select an existing playlist and load its tracks.
+- Shows pending staged changes for the selected playlist (+added / -removed).
+- Lets users add tracks from Search Results into the selected playlist view.
+- Lets users remove tracks from the selected playlist view.
+- Persists selected-playlist changes only on SAVE CHANGES.
+- Clears pending staged edits when a different playlist is selected.
+
+TECHNICAL DESIGN (IMPLEMENTED)
+
+1) Retrieve and Display User Playlists
+- App owns the user playlist state (`userPlaylists`) and retrieves playlists on mount.
+- `Spotify.getUserPlaylists()` calls Spotify Web API endpoint:
+  - `GET https://api.spotify.com/v1/me/playlists?limit=50`
+- Pagination is implemented by following `data.next` until null.
+- `PlaylistList` is a presentational component that receives `playlists` and `onSelect` via props.
+
+Notes:
+- The implementation uses React hooks (`useEffect`, `useState`, `useCallback`) in functional components.
+- No class lifecycle methods (such as `componentWillMount`) are used.
+
+2) Select Playlist and Load Tracks
+- App exposes `handleSelectPlaylist(playlist)` and passes it into `PlaylistList`.
+- On click, `PlaylistList` calls `onSelect(playlist)`.
+- App then loads tracks via:
+  - `Spotify.getPlaylistTracks(playlist.id)`
+  - Endpoint used: `GET https://api.spotify.com/v1/playlists/{playlist_id}/tracks?limit=100`
+- Track pagination is implemented by following `data.next` until null.
+- Response items are normalized into app track shape:
+  - `{ id, name, artist, album, uri }`
+
+3) Staged Edit Model for Existing Playlists
+For selected existing playlists, edits are staged in local UI first, then persisted on explicit save.
+
+App state used for staging:
+- `selectedPlaylist` - currently selected playlist object.
+- `selectedPlaylistTracks` - current in-UI track list for selected playlist.
+- `originalSelectedTrackUris` - snapshot of playlist URIs when loaded.
+- `pendingAddedUris` - URIs staged for addition.
+- `pendingRemovedUris` - URIs staged for removal.
+- `isSavingSelected` - save-in-progress flag.
+
+Behavior:
+- Add track while selected playlist is active:
+  - Track is added locally to `selectedPlaylistTracks`.
+  - URI is tracked in `pendingAddedUris` when not part of original snapshot.
+  - If URI was previously marked removed, it is removed from `pendingRemovedUris`.
+- Remove track while selected playlist is active:
+  - Track is removed locally from `selectedPlaylistTracks`.
+  - If URI existed in original snapshot, it is added to `pendingRemovedUris`.
+  - If URI was only added during current edit session, it is removed from `pendingAddedUris`.
+
+4) Save Changes for Selected Playlist
+- SAVE CHANGES button is rendered in selected playlist panel.
+- Button is disabled when:
+  - no playlist is selected,
+  - no pending changes exist, or
+  - save is already in progress.
+
+Save flow (`saveSelectedPlaylistChanges`):
+- Apply removals first:
+  - `Spotify.removeTrackFromPlaylist(playlistId, trackUri)`
+  - Endpoint: `DELETE https://api.spotify.com/v1/playlists/{playlist_id}/tracks`
+- Apply additions second:
+  - `Spotify.addTrackToPlaylist(playlistId, trackUri)`
+  - Endpoint: `POST https://api.spotify.com/v1/playlists/{playlist_id}/tracks`
+- Refresh playlist from Spotify (`getPlaylistTracks`) after save to ensure UI matches source of truth.
+- Reset pending arrays and original snapshot after successful refresh.
+
+5) New Playlist Creation Flow Still Exists
+The original create-new flow remains independent:
+- Draft state: `playlistName`, `playlistTracks`
+- Save action: `Spotify.savePlaylist(name, trackUris)`
+- This flow creates a new playlist and adds tracks to it.
+
+IMPORTANT UX DIFFERENCE
+- Existing playlist edits (selected playlist panel) are staged and saved only via SAVE CHANGES.
+- New playlist edits (new playlist panel) are saved via SAVE TO Spotify.
+- These are intentionally separate workflows.
+
+API METHODS CURRENTLY USED
+- `getAccessToken()`
+- `search(term)`
+- `savePlaylist(name, trackUris)`
+- `getUserPlaylists()`
+- `getPlaylistTracks(playlistId)`
+- `removeTrackFromPlaylist(playlistId, trackUri)`
+- `addTrackToPlaylist(playlistId, trackUri)`
+
+CAVEATS AND LIMITATIONS
+1) Playlist Ownership and Permissions
+- Not every playlist returned by Spotify is necessarily editable by the current user.
+- Add/remove operations can fail for playlists the user cannot modify.
+
+2) Partial Save Failure Handling
+- Save currently attempts all pending removals/additions.
+- If some API calls fail, errors are logged and data is refreshed after attempted save.
+- Future enhancement: surface per-track save errors in UI.
+
+3) Name Editing for Existing Playlists
+- Existing selected playlist name editing is not part of staged-save flow yet.
+- Current selected playlist flow stages track add/remove changes only.
+
+4) Spotify App Access Model
+- In development mode, Spotify limits usage to owner + added test users.
+- Broader usage requires appropriate Spotify app settings and approval path.
+
+FUTURE IMPROVEMENTS (OPTIONAL)
+- Add in-UI success/error toasts for selected-playlist save operations.
+- Add optimistic rollback behavior for failed subset operations.
+- Add explicit unsaved-changes warning when switching selected playlists.
+- Add support for editing selected playlist metadata (for example, playlist name).

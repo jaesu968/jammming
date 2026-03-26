@@ -11,6 +11,9 @@ Jammming is a full-stack music discovery and playlist management application. Us
 - Rename their playlist before saving
 - Save completed playlists directly to their Spotify account
 - Remove tracks from the playlist before saving
+- View their existing Spotify playlists in-app
+- Select an existing playlist and view all tracks
+- Stage add/remove edits to an existing playlist and commit them with a dedicated Save Changes button
 
 ## Technologies Used
 
@@ -36,9 +39,9 @@ The application follows a **component-based architecture** with React hooks for 
 ### Core Components
 
 1. **App Component** (`App.js`)
-   - Main container managing global state (search results, playlist, playlist name)
+   - Main container managing global state (search results, draft playlist, user playlists, selected playlist, staged edit state)
    - Uses React Hooks: `useState`, `useCallback`, `useEffect`
-   - Handles all core application logic and state updates
+   - Handles core application logic including staged editing for existing playlists
 
 2. **SearchBar** (`SearchBar.js`)
    - Input field for users to enter search terms
@@ -61,6 +64,15 @@ The application follows a **component-based architecture** with React hooks for 
    - Allows renaming the playlist
    - Provides save functionality
 
+7. **PlaylistList** (`PlaylistList.js`)
+   - Displays existing playlists from the authenticated Spotify account
+   - Allows selecting one playlist to load in the bottom-right panel
+
+8. **Selected Playlist Panel** (`App.js` + `TrackList.js`)
+   - Displays tracks from the selected existing playlist
+   - Supports staged add/remove edits
+   - Saves staged edits only when `SAVE CHANGES` is clicked
+
 ### Spotify Integration (`Spotify.js`)
 
 The Spotify utility module handles:
@@ -76,22 +88,35 @@ The Spotify utility module handles:
 - **Playlist Management**
   - Creates new playlist under user's Spotify account
   - Adds tracks to the created playlist
-  - Uses Spotify track URIs for accurate track identification
+   - Fetches user playlists from `/v1/me/playlists` (with pagination)
+   - Fetches tracks from a selected playlist via `/v1/playlists/{playlist_id}/tracks`
+   - Stages changes locally and then applies track additions/removals to existing playlists
+   - Uses Spotify track URIs for accurate track identification
 
 ### State Management
 
 The app uses **React Hooks** for state management:
 - `searchResults` - Stores tracks from search queries
-- `playlistName` - Current playlist name
-- `playlistTracks` - Array of tracks added to the playlist
+- `playlistName` - Draft playlist name for creating a new playlist
+- `playlistTracks` - Draft tracks for creating a new playlist
+- `userPlaylists` - Existing playlists loaded from Spotify
+- `selectedPlaylist` - Currently selected existing playlist
+- `selectedPlaylistTracks` - Tracks currently shown for the selected existing playlist
+- `pendingAddedUris` / `pendingRemovedUris` - Staged edits for selected playlist changes
 
 ### Key Features
 
 - **Real-time Search** - Search Spotify's database for tracks as you type
-- **Playlist Customization** - Add/remove tracks and name your playlist
+- **New Playlist Creation** - Add/remove tracks and name a brand-new playlist
+- **Existing Playlist Editing** - Select existing playlists, stage edits, and save changes explicitly
 - **Persistent Authentication** - Token caching with expiration handling
 - **Spotify Integration** - Direct playlist saving to user's Spotify account
+- **Controlled Save Flow** - Existing playlist edits only persist on `SAVE CHANGES`
 - **Responsive Design** - Background image from Adobe Firefly AI
+
+## Important Note About Spotify Access
+
+Spotify developer apps in **Development mode** are limited to the app owner and users/testers added in the Spotify Developer Dashboard. If you want broader access, ensure your app settings and Spotify account permissions are configured appropriately.
 
 ## Getting Started
 
