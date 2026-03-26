@@ -29,7 +29,7 @@ const PlaylistList = (props) => {
                     <li
                         key={playlist.id}
                         onClick={() => handleSelect(playlist)}
-                        className={selectedPlaylist?.id === playlist.id ? "selected" : ""}
+                        className={`playlist-item ${selectedPlaylist?.id === playlist.id ? "selected" : ""}`.trim()}
                     >
                         {playlist.name}
                     </li>

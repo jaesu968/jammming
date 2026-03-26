@@ -36,6 +36,19 @@ function App() {
     .catch(error => console.error('Error fetching playlist tracks:', error)); // log any errors that occur while fetching the playlist tracks
   }, []);
 
+  const removeFromSelectedPlaylist = useCallback((track) => {
+    if (!selectedPlaylist) return;
+
+    Spotify.removeTrackFromPlaylist(selectedPlaylist.id, track.uri)
+    .then((removed) => {
+      if (!removed) return;
+      setSelectedPlaylistTracks((prevTracks) =>
+        prevTracks.filter((savedTrack) => savedTrack.id !== track.id)
+      );
+    })
+    .catch((error) => console.error('Error removing track from playlist:', error));
+  }, [selectedPlaylist]);
+
   // useEffect hook to intialize Spotify API when the component mounts
   useEffect(() => {
     Spotify.getAccessToken().then(token => {
@@ -57,12 +70,26 @@ function App() {
   // define the add track function 
   const addTrack = useCallback(
     (track) => {
+      if (selectedPlaylist) {
+        if (selectedPlaylistTracks.some((savedTrack) => savedTrack.id === track.id)) {
+          return;
+        }
+
+        Spotify.addTrackToPlaylist(selectedPlaylist.id, track.uri)
+        .then((added) => {
+          if (!added) return;
+          setSelectedPlaylistTracks((prevTracks) => [...prevTracks, track]);
+        })
+        .catch((error) => console.error('Error adding track to selected playlist:', error));
+        return;
+      }
+
       // check if the track is already in the playlist
       if (playlistTracks.some((savedTrack) => savedTrack.id === track.id))
         return; // if the track is already in the playlist, return
       // call back the setPlaylistTracks function with the new track added to the array
       setPlaylistTracks((prevTracks) => [...prevTracks, track]); // 
-    }, [playlistTracks] // the dependencies are the playlistTracks array
+    }, [playlistTracks, selectedPlaylist, selectedPlaylistTracks] // dependencies for draft and selected playlist flows
   ); 
 
   // define the remove track function
@@ -113,6 +140,10 @@ function App() {
         />
       </div>
 
+      <div>
+        <h1>Your Playlists</h1>
+      </div>
+
       <section className="App-user-playlists">
         <PlaylistList 
         playlists={userPlaylists} 
@@ -121,7 +152,12 @@ function App() {
 
         <div className="App-selected-playlist">
           <h2>{selectedPlaylist ? selectedPlaylist.name : 'Select a playlist'}</h2>
-          <TrackList tracks={selectedPlaylistTracks} showAction={false} />
+          <TrackList
+            tracks={selectedPlaylistTracks}
+            isRemoval={true}
+            onRemove={removeFromSelectedPlaylist}
+            showAction={!!selectedPlaylist}
+          />
         </div>
       </section>
     </div>

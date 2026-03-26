@@ -6,6 +6,7 @@
     padding: 0.88rem;
     background-color: #e9e93280;
     box-shadow: 0 4px 2px 2px #000000; /* top left right bottom */
+    border-radius: 12px; /* Rounded corners */
 } 
 
 /* Styling for the PlaylistList header */
@@ -22,4 +23,26 @@
 .PlaylistList::-webkit-scrollbar-thumb {
     background: #888; /* color of the thumb */
     border-radius: 4px; /* roundness of the thumb */
+}
+
+.PlaylistList ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.playlist-item {
+    cursor: pointer;
+    padding: 0.65rem 0.75rem;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.playlist-item:hover {
+    background-color: rgba(255, 255, 255, 0.35);
+}
+
+.playlist-item.selected {
+    background-color: rgba(255, 255, 255, 0.55);
+    font-weight: 600;
 }

@@ -31,7 +31,7 @@ h1 .highlight {
   height: 100%; 
   width: 100%; 
   margin: 0; /* Removes default margin */
-  padding: 0; /* Removes default padding */
+  padding: 20px; /* Adds padding around the app */
   min-height: 100vh; /* Ensures the app takes up the full height of the viewport */
   text-align: center;
   background-image: url('FireflyForestStereo.jpg');
@@ -48,6 +48,7 @@ h1 .highlight {
   justify-content: space-between; 
   width: 100%; 
   gap: 2rem; 
+  border-radius: 12px; 
 }
 
 .App-user-playlists {
@@ -60,11 +61,11 @@ h1 .highlight {
 }
 
 .App-selected-playlist {
-  background: rgba(0, 0, 0, 0.55);
+  background: #e9e93280;
   border-radius: 12px;
   padding: 1rem;
   text-align: left;
-  color: #fff;
+  color: #000000;
 }
 
 .App-selected-playlist h2 {

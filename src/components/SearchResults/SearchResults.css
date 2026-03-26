@@ -6,6 +6,7 @@
     padding: 0.88rem;
     background-color: #e9e93280;
     box-shadow: 0 4px 2px 2px #000000; /* top left right bottom */
+    border-radius: 12px; /* Rounded corners */
 } 
 
 /* Styling for the SearchResults header */
