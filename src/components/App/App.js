@@ -26,12 +26,22 @@ function App() {
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   // store tracks from the selected existing Spotify playlist
   const [selectedPlaylistTracks, setSelectedPlaylistTracks] = useState([]);
+  // Keep a snapshot of the original selected playlist so we can stage edits locally.
+  // We only commit these edits to Spotify when the user clicks SAVE CHANGES.
+  const [originalSelectedTrackUris, setOriginalSelectedTrackUris] = useState([]);
+  const [pendingAddedUris, setPendingAddedUris] = useState([]);
+  const [pendingRemovedUris, setPendingRemovedUris] = useState([]);
+  const [isSavingSelected, setIsSavingSelected] = useState(false);
   // get the selected playlist's tracks and name when a playlist is selected from the playlist list component
   const handleSelectPlaylist = useCallback((playlist) => {
     setSelectedPlaylist(playlist); // update the selected playlist state
     Spotify.getPlaylistTracks(playlist.id) // call the getPlaylistTracks function from the Spotify class with the selected playlist's id
     .then(tracks => {
       setSelectedPlaylistTracks(tracks); // update the selected playlist track list in the bottom right pane
+      // Reset staged change state every time a different playlist is selected.
+      setOriginalSelectedTrackUris(tracks.map((track) => track.uri));
+      setPendingAddedUris([]);
+      setPendingRemovedUris([]);
     })
     .catch(error => console.error('Error fetching playlist tracks:', error)); // log any errors that occur while fetching the playlist tracks
   }, []);
@@ -39,15 +49,21 @@ function App() {
   const removeFromSelectedPlaylist = useCallback((track) => {
     if (!selectedPlaylist) return;
 
-    Spotify.removeTrackFromPlaylist(selectedPlaylist.id, track.uri)
-    .then((removed) => {
-      if (!removed) return;
-      setSelectedPlaylistTracks((prevTracks) =>
-        prevTracks.filter((savedTrack) => savedTrack.id !== track.id)
+    // Stage removal in UI immediately so the user can review pending edits.
+    setSelectedPlaylistTracks((prevTracks) =>
+      prevTracks.filter((savedTrack) => savedTrack.id !== track.id)
+    );
+
+    if (originalSelectedTrackUris.includes(track.uri)) {
+      // Track existed originally, so mark it as a pending removal.
+      setPendingRemovedUris((prevUris) =>
+        prevUris.includes(track.uri) ? prevUris : [...prevUris, track.uri]
       );
-    })
-    .catch((error) => console.error('Error removing track from playlist:', error));
-  }, [selectedPlaylist]);
+    } else {
+      // Track was added during this session, so remove it from pending adds instead.
+      setPendingAddedUris((prevUris) => prevUris.filter((uri) => uri !== track.uri));
+    }
+  }, [selectedPlaylist, originalSelectedTrackUris]);
 
   // useEffect hook to intialize Spotify API when the component mounts
   useEffect(() => {
@@ -71,16 +87,21 @@ function App() {
   const addTrack = useCallback(
     (track) => {
       if (selectedPlaylist) {
+        // Prevent duplicate tracks in the currently selected playlist view.
         if (selectedPlaylistTracks.some((savedTrack) => savedTrack.id === track.id)) {
           return;
         }
 
-        Spotify.addTrackToPlaylist(selectedPlaylist.id, track.uri)
-        .then((added) => {
-          if (!added) return;
-          setSelectedPlaylistTracks((prevTracks) => [...prevTracks, track]);
-        })
-        .catch((error) => console.error('Error adding track to selected playlist:', error));
+        // Stage addition locally; save button will persist to Spotify.
+        setSelectedPlaylistTracks((prevTracks) => [...prevTracks, track]);
+        setPendingRemovedUris((prevUris) => prevUris.filter((uri) => uri !== track.uri));
+
+        if (!originalSelectedTrackUris.includes(track.uri)) {
+          setPendingAddedUris((prevUris) =>
+            prevUris.includes(track.uri) ? prevUris : [...prevUris, track.uri]
+          );
+        }
+
         return;
       }
 
@@ -89,8 +110,44 @@ function App() {
         return; // if the track is already in the playlist, return
       // call back the setPlaylistTracks function with the new track added to the array
       setPlaylistTracks((prevTracks) => [...prevTracks, track]); // 
-    }, [playlistTracks, selectedPlaylist, selectedPlaylistTracks] // dependencies for draft and selected playlist flows
+    }, [playlistTracks, selectedPlaylist, selectedPlaylistTracks, originalSelectedTrackUris] // dependencies for draft and selected playlist flows
   ); 
+
+  const saveSelectedPlaylistChanges = useCallback(async () => {
+    if (!selectedPlaylist || isSavingSelected) return;
+
+    if (!pendingAddedUris.length && !pendingRemovedUris.length) {
+      return;
+    }
+
+    setIsSavingSelected(true);
+
+    try {
+      // Apply deletions first, then additions, to keep playlist state predictable.
+      const removeResults = await Promise.all(
+        pendingRemovedUris.map((trackUri) => Spotify.removeTrackFromPlaylist(selectedPlaylist.id, trackUri))
+      );
+
+      const addResults = await Promise.all(
+        pendingAddedUris.map((trackUri) => Spotify.addTrackToPlaylist(selectedPlaylist.id, trackUri))
+      );
+
+      if (removeResults.some((result) => !result) || addResults.some((result) => !result)) {
+        console.error('Some playlist changes failed to save.');
+      }
+
+      // Refresh from Spotify so UI reflects the source of truth after save.
+      const refreshedTracks = await Spotify.getPlaylistTracks(selectedPlaylist.id);
+      setSelectedPlaylistTracks(refreshedTracks);
+      setOriginalSelectedTrackUris(refreshedTracks.map((track) => track.uri));
+      setPendingAddedUris([]);
+      setPendingRemovedUris([]);
+    } catch (error) {
+      console.error('Error saving selected playlist changes:', error);
+    } finally {
+      setIsSavingSelected(false);
+    }
+  }, [selectedPlaylist, isSavingSelected, pendingAddedUris, pendingRemovedUris]);
 
   // define the remove track function
   const removeTrack = useCallback((track) => {
@@ -107,7 +164,7 @@ function App() {
 
   // define a save playlist function 
   const savePlaylist = useCallback(() => {
-    // mock save logic here until API is implemented
+    // Save the "New Playlist" editor panel as a brand new Spotify playlist.
     const trackUris = playlistTracks.map((track) => track.uri); // map the playlist tracks to an array of track uris
     if(playlistName && trackUris.length){
       Spotify.savePlaylist(playlistName, trackUris)
@@ -119,6 +176,9 @@ function App() {
     }
 
   }, [playlistName, playlistTracks]); // the dependencies are the playlistName and playlistTracks arrays
+
+  const hasPendingSelectedChanges = pendingAddedUris.length > 0 || pendingRemovedUris.length > 0;
+  const pendingSelectedSummary = `Pending changes: +${pendingAddedUris.length} / -${pendingRemovedUris.length}`;
 
 
   // render the app component
@@ -152,12 +212,22 @@ function App() {
 
         <div className="App-selected-playlist">
           <h2>{selectedPlaylist ? selectedPlaylist.name : 'Select a playlist'}</h2>
+          {selectedPlaylist && (
+            <p className="App-selected-pending">{pendingSelectedSummary}</p>
+          )}
           <TrackList
             tracks={selectedPlaylistTracks}
             isRemoval={true}
             onRemove={removeFromSelectedPlaylist}
             showAction={!!selectedPlaylist}
           />
+          <button
+            className="App-selected-save"
+            onClick={saveSelectedPlaylistChanges}
+            disabled={!selectedPlaylist || !hasPendingSelectedChanges || isSavingSelected}
+          >
+            {isSavingSelected ? 'SAVING CHANGES...' : 'SAVE CHANGES'}
+          </button>
         </div>
       </section>
     </div>

@@ -72,6 +72,35 @@ h1 .highlight {
   margin-top: 0;
 }
 
+.App-selected-pending {
+  margin: 0 0 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.App-selected-save {
+  cursor: pointer;
+  width: 12rem;
+  padding: 0.7rem 0;
+  border-radius: 54px;
+  border: none;
+  margin-top: 1.27rem;
+  background-color: #61dafb;
+  font-size: 0.83rem;
+  transition: background-color 0.25s;
+  color: #000000;
+  font-weight: 600;
+}
+
+.App-selected-save:hover {
+  background-color: #43d797;
+}
+
+.App-selected-save:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 @media (max-width: 900px) {
   .App-playlist {
     flex-direction: column;
