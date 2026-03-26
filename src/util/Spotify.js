@@ -4,9 +4,10 @@
 
 // client id for spotify API 
 const clientId = '5fc8733a17574f7a843cc4179ba48f1b'; // the client id is used to identify the app to the Spotify API
-const redirectUri = process.env.NODE_ENV === 'production' 
-  ? 'https://jaesu968.github.io/jammming' 
-  : 'http://127.0.0.1:3000'; // the redirect uri is used to redirect the user back to the app after authorization
+const appUrl = process.env.NODE_ENV === 'production'
+    ? 'https://jaesu968.github.io/jammming'
+    : 'http://127.0.0.1:3000';
+const redirectUri = appUrl; // the redirect uri is used to redirect the user back to the app after authorization
 const tokenKey = 'spotify_auth_token'; // the token key is used to store the access token in the local storage
 const scope = 'playlist-modify-public playlist-modify-private'; // the scope is used to request permissions from the user
 
@@ -102,7 +103,7 @@ const Spotify = {
                 // store token with expiration time (typically 1 hour) 
                 localStorage.setItem(tokenKey, data.access_token); // store the access token in the local storage
                 localStorage.setItem('token_expiration', String(Date.now() + 3600000)); // store the token expiration time in the local storage)
-                window.history.replaceState({}, document.title, '/'); // replace the current URL with the root URL
+                window.history.replaceState({}, document.title, redirectUri); // replace the current URL with the app URL
                 return data.access_token; // return the access token
             } else {
                 throw new Error('Failed to get access token'); // throw an error if the response does not contain an access token
@@ -113,7 +114,7 @@ const Spotify = {
                 localStorage.removeItem(tokenKey); // remove the access token from the local storage
                 localStorage.removeItem('token_expiration'); // remove the token expiration time from the local storage
                 localStorage.removeItem('code_verifier'); // remove the code verifier from the local storage
-                window.location.href = '/'; // redirect the user to the root URL
+                window.location.href = redirectUri; // redirect the user to the app URL
                 return null; // return null if there is an error
             }
         }
@@ -135,7 +136,7 @@ const Spotify = {
         if (!token){
             // trigger the authorization flow if no token 
             console.log('No token available, redirecting to auth...'); 
-            window.location.href = '/'; // redirect the user to the root URL
+            window.location.href = redirectUri; // redirect the user to the app URL
             return []; // return an empty array if there is no token
         }
         
@@ -182,7 +183,7 @@ async savePlaylist(name, trackUris) {
 
         const token = await Spotify.getAccessToken(); 
         if (!token) {
-            window.location.href = '/';
+            window.location.href = redirectUri;
             return; // return if there is no token
         }
 
