@@ -1,9 +1,11 @@
 // This component is used to manipulate individual tracks
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import "./Track.css"; // import the css file for the track component
 
 // this is the track component 
 const Track = (props) => {
+    const { track, onAdd, onRemove, isRemoval } = props;
+
     // add track function 
     // the useCallback hook is used to memorize the function so that it is not recreated on every render
     // this is used to optimize performance and avoid unnecessary re-renders
@@ -11,16 +13,16 @@ const Track = (props) => {
     // the function will only be recreated if the dependencies change
     // in this case, the dependencies are the onAdd and onRemove functions that are passed as props to the component
     // the depenencies are the tracks you are adding and the function that is being called
-    const addTrack = useCallback((event) => {
-        props.onAdd(props.track);
-    }, [props.onAdd, props.track]); 
+    const addTrack = useCallback(() => {
+        onAdd(track);
+    }, [onAdd, track]); 
     // remove track function
-    const removeTrack = useCallback((event) => {
-        props.onRemove(props.track);
-    }, [props.onRemove, props.track]);
+    const removeTrack = useCallback(() => {
+        onRemove(track);
+    }, [onRemove, track]);
     // a function to render the adding or removal of a track
     const renderAction = () => {
-        if (props.isRemoval) {
+        if (isRemoval) {
             return (
                 <button className="Track-action" onClick={removeTrack}>
                     -
@@ -38,9 +40,9 @@ const Track = (props) => {
     return (
         <div className="Track">
             <div className="Track-information">
-                <h3>{props.track.name}</h3>
+                <h3>{track.name}</h3>
                 <p>
-                    {props.track.artist} | {props.track.album}
+                    {track.artist} | {track.album}
                 </p>
             </div>
             {renderAction()}
