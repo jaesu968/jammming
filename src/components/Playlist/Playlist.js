@@ -8,11 +8,13 @@ import TrackList from "../TrackList/TrackList"; // import the track list compone
 
 // this is the playlist component 
 const Playlist = (props) => {
+    const { onNameChange, playlistTracks, onRemove, onSave } = props;
+
     // function to handle name changes in the playlist
     const handleNameChange = useCallback( 
         (event) => {
-            props.onNameChange(event.target.value); // call the onNameChange function passed as a prop
-        }, [props.onNameChange] // the dependencies are the onNameChange function that is passed as a prop
+            onNameChange(event.target.value); // call the onNameChange function passed as a prop
+        }, [onNameChange] // the dependencies are the onNameChange function that is passed as a prop
     ); 
 
     // render the playlist component
@@ -21,11 +23,11 @@ const Playlist = (props) => {
         <div className="Playlist">
             <input onChange={handleNameChange} defaultValue={"New Playlist"} />
             <TrackList 
-                tracks={props.playlistTracks} // pass the playlist tracks as a prop
+                tracks={playlistTracks} // pass the playlist tracks as a prop
                 isRemoval={true} // set isRemoval to true so that the remove button is displayed
-                onRemove={props.onRemove} // pass the onRemove function as a prop
+                onRemove={onRemove} // pass the onRemove function as a prop
             />
-            <button className="Playlist-save" onClick={props.onSave}>
+            <button className="Playlist-save" onClick={onSave}>
                 SAVE TO Spotify
                 </button> 
         </div>
