@@ -50,6 +50,40 @@ h1 .highlight {
   gap: 2rem; 
 }
 
+.App-user-playlists {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1.5rem 2rem 2rem;
+}
+
+.App-selected-playlist {
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: left;
+  color: #fff;
+}
+
+.App-selected-playlist h2 {
+  margin-top: 0;
+}
+
+@media (max-width: 900px) {
+  .App-playlist {
+    flex-direction: column;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+
+  .App-user-playlists {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+}
+
 
 
 

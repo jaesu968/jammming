@@ -9,7 +9,7 @@ const appUrl = process.env.NODE_ENV === 'production'
     : 'http://127.0.0.1:3000';
 const redirectUri = appUrl; // the redirect uri is used to redirect the user back to the app after authorization
 const tokenKey = 'spotify_auth_token'; // the token key is used to store the access token in the local storage
-const scope = 'playlist-modify-public playlist-modify-private'; // the scope is used to request permissions from the user
+const scope = 'playlist-modify-public playlist-modify-private playlist-read-private'; // the scope is used to request permissions from the user
 
 // generating a code verifier and code challenge since we will use PKCE flow to authenticate with Spotify
 // code verifier is a random string that is used to generate the code challenge
@@ -124,8 +124,8 @@ const Spotify = {
             // use try catch block to handle errors
             try {
 
-                // check if the serach term is empty 
-                if (!term || term.trim() === ' '){
+                // check if the search term is empty 
+                if (!term || term.trim() === ''){
                     console.log('Search term is empty'); // log the error to the console
                     return []; // return an empty array if the search term is empty
                 }
@@ -213,6 +213,64 @@ async savePlaylist(name, trackUris) {
             if (!trackResponse.ok) throw new Error('Failed to add tracks to playlist');
         } catch (error) {
             console.error('Spotify playlist error:', error);
+        }
+    }, 
+    // end of savePlaylist function
+    // function to get the user's playlists from the Spotify API 
+    async getUserPlaylists() {
+        const token = await Spotify.getAccessToken();
+        if (!token) {
+            window.location.href = redirectUri;
+            return []; // return an empty array if there is no token
+        }
+        try {
+            let items = [];
+            let url = 'https://api.spotify.com/v1/me/playlists?limit=50';
+            while (url) {
+                const response = await fetch(url, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Failed to get user playlists');
+                const data = await response.json();
+                items = items.concat(data.items);
+                url = data.next; // null when no more pages
+            }
+            return items; // return all the user's playlists
+        } catch (error) {
+            console.error('Spotify playlist error:', error);
+            return []; // return an empty array if an error occurs
+        }
+    }, 
+    // end of getUserPlaylists function
+    // get selected playlist's tracks from the Spotify API
+    async getPlaylistTracks(playlistId) {
+        const token = await Spotify.getAccessToken();
+        if (!token) {
+            window.location.href = redirectUri; 
+            return []; // return an empty array if there is no token
+        }
+        try {
+            let items = [];
+            let url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100`;
+            while (url) {
+                const response = await fetch(url, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Failed to get playlist tracks');
+                const data = await response.json();
+                items = items.concat(data.items);
+                url = data.next; // null when no more pages
+            }
+            return items.map(item => ({ // map the tracks to an array of objects   
+                id: item.track.id, // set the id to the track id
+                name: item.track.name, // set the name to the track name
+                artist: item.track.artists[0].name, // set the artist to the first artist in the track
+                album: item.track.album.name, // set the album to the album name
+                uri: item.track.uri // set the uri to the track uri 
+            })); // return the array of objects 
+        } catch (error) {
+            console.error('Spotify playlist tracks error:', error);
+            return []; // return an empty array if an error occurs
         }
     }
 }; // closing bracket for Spotify object

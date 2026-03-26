@@ -4,7 +4,7 @@ import "./Track.css"; // import the css file for the track component
 
 // this is the track component 
 const Track = (props) => {
-    const { track, onAdd, onRemove, isRemoval } = props;
+    const { track, onAdd, onRemove, isRemoval, showAction = true } = props;
 
     // add track function 
     // the useCallback hook is used to memorize the function so that it is not recreated on every render
@@ -22,6 +22,10 @@ const Track = (props) => {
     }, [onRemove, track]);
     // a function to render the adding or removal of a track
     const renderAction = () => {
+        if (!showAction) {
+            return null;
+        }
+
         if (isRemoval) {
             return (
                 <button className="Track-action" onClick={removeTrack}>

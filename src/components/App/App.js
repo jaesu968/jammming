@@ -6,6 +6,8 @@ import Playlist from '../Playlist/Playlist'; // import the playlist component
 import SearchBar from '../SearchBar/SearchBar'; // import the search bar component
 import SearchResults from '../SearchResults/SearchResults'; // import the search results component 
 import Spotify from '../../util/Spotify'; // import the spotify class
+import PlaylistList from '../PlaylistList/PlaylistList'; // import the playlist list component
+import TrackList from '../TrackList/TrackList'; // import the track list component
 
 
 function App() {
@@ -18,10 +20,27 @@ function App() {
   // store the state of the playlist tracks 
   // initialize the state with an empty array
   const [playlistTracks, setPlaylistTracks] = useState([]);
+  // store the user's existing Spotify playlists
+  const [userPlaylists, setUserPlaylists] = useState([]);
+  // store the selected playlist from the playlist list component
+  const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+  // store tracks from the selected existing Spotify playlist
+  const [selectedPlaylistTracks, setSelectedPlaylistTracks] = useState([]);
+  // get the selected playlist's tracks and name when a playlist is selected from the playlist list component
+  const handleSelectPlaylist = useCallback((playlist) => {
+    setSelectedPlaylist(playlist); // update the selected playlist state
+    Spotify.getPlaylistTracks(playlist.id) // call the getPlaylistTracks function from the Spotify class with the selected playlist's id
+    .then(tracks => {
+      setSelectedPlaylistTracks(tracks); // update the selected playlist track list in the bottom right pane
+    })
+    .catch(error => console.error('Error fetching playlist tracks:', error)); // log any errors that occur while fetching the playlist tracks
+  }, []);
 
   // useEffect hook to intialize Spotify API when the component mounts
   useEffect(() => {
-    Spotify.getAccessToken(); // call the getAccessToken function from the Spotify class
+    Spotify.getAccessToken().then(token => {
+      if (token) Spotify.getUserPlaylists().then(setUserPlaylists);
+    });
   }, []);
 
   // define the search function  // this will use a callback function to search for tracks \
@@ -92,8 +111,20 @@ function App() {
         onRemove={removeTrack} // pass the remove track function to the playlist component
         onSave={savePlaylist} // pass the save playlist function to the playlist component
         />
-        </div> 
       </div>
+
+      <section className="App-user-playlists">
+        <PlaylistList 
+        playlists={userPlaylists} 
+        onSelect={handleSelectPlaylist} 
+        />
+
+        <div className="App-selected-playlist">
+          <h2>{selectedPlaylist ? selectedPlaylist.name : 'Select a playlist'}</h2>
+          <TrackList tracks={selectedPlaylistTracks} showAction={false} />
+        </div>
+      </section>
+    </div>
       <footer>Background Image comes from Adobe Firefly AI Image Generation</footer>
     </div>
   );
