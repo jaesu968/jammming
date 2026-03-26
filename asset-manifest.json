@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.css": "/jammming/static/css/main.beb4d78d.css",
-    "main.js": "/jammming/static/js/main.32cd673c.js",
+    "main.css": "/jammming/static/css/main.eaa05353.css",
+    "main.js": "/jammming/static/js/main.636de0d8.js",
     "static/media/FireflyForestStereo.jpg": "/jammming/static/media/FireflyForestStereo.2a0f92a4bbbffeafe21e.jpg",
     "index.html": "/jammming/index.html",
-    "main.beb4d78d.css.map": "/jammming/static/css/main.beb4d78d.css.map",
-    "main.32cd673c.js.map": "/jammming/static/js/main.32cd673c.js.map"
+    "main.eaa05353.css.map": "/jammming/static/css/main.eaa05353.css.map",
+    "main.636de0d8.js.map": "/jammming/static/js/main.636de0d8.js.map"
   },
   "entrypoints": [
-    "static/css/main.beb4d78d.css",
-    "static/js/main.32cd673c.js"
+    "static/css/main.eaa05353.css",
+    "static/js/main.636de0d8.js"
   ]
 }
