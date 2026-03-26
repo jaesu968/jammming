@@ -5,6 +5,8 @@ import './SearchBar.css';
 
 // this is the search bar component
 const SearchBar = (props) => {
+    const { onSearch } = props;
+
     const [term, setTerm] = useState(""); // set it to an empty string 
     // loading state to handle serch in progress
     const [isSearching, setIsSearching] = useState(false); // set it to false by default
@@ -26,13 +28,13 @@ const SearchBar = (props) => {
         try {
             setIsSearching(true); // set the loading state to true
             console.log('Searching for: ' + term); // log the search term (see if search is working)
-            await props.onSearch(term); // call the onSearch function passed from the parent component
+            await onSearch(term); // call the onSearch function passed from the parent component
          } catch (error) {
             console.error('Search error: ' + error); // log the error
         } finally {
             setIsSearching(false); // set the loading state to false
         }
-    }, [props.onSearch, term]); // dependendcies, so it will run every time the term or onSearch changes)
+    }, [onSearch, term]); // dependendcies, so it will run every time the term or onSearch changes)
 
     // add keyboard support for support (the enter key)
     const handleKeyPress = useCallback((event) => {
