@@ -4,9 +4,7 @@
 
 // client id for spotify API 
 const clientId = '5fc8733a17574f7a843cc4179ba48f1b'; // the client id is used to identify the app to the Spotify API
-const appUrl = process.env.NODE_ENV === 'production'
-    ? 'https://jaesu968.github.io/jammming'
-    : 'http://127.0.0.1:3000';
+const appUrl = `${window.location.origin}${window.location.pathname}`;
 const redirectUri = appUrl; // the redirect uri is used to redirect the user back to the app after authorization
 const tokenKey = 'spotify_auth_token'; // the token key is used to store the access token in the local storage
 const scope = 'playlist-modify-public playlist-modify-private playlist-read-private'; // the scope is used to request permissions from the user
