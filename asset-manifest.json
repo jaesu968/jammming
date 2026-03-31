@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.css": "/jammming/static/css/main.eaa05353.css",
-    "main.js": "/jammming/static/js/main.636de0d8.js",
-    "static/media/FireflyForestStereo.jpg": "/jammming/static/media/FireflyForestStereo.2a0f92a4bbbffeafe21e.jpg",
-    "index.html": "/jammming/index.html",
-    "main.eaa05353.css.map": "/jammming/static/css/main.eaa05353.css.map",
-    "main.636de0d8.js.map": "/jammming/static/js/main.636de0d8.js.map"
+    "main.css": "./static/css/main.ff3f2168.css",
+    "main.js": "./static/js/main.9e43817d.js",
+    "static/media/FireflyForestStereo.jpg": "./static/media/FireflyForestStereo.2a0f92a4bbbffeafe21e.jpg",
+    "index.html": "./index.html",
+    "main.ff3f2168.css.map": "./static/css/main.ff3f2168.css.map",
+    "main.9e43817d.js.map": "./static/js/main.9e43817d.js.map"
   },
   "entrypoints": [
-    "static/css/main.eaa05353.css",
-    "static/js/main.636de0d8.js"
+    "static/css/main.ff3f2168.css",
+    "static/js/main.9e43817d.js"
   ]
 }
