@@ -16,6 +16,12 @@ Jammming is a full-stack music discovery and playlist management application. Us
 - Stage add/remove edits to an existing playlist and commit them with a dedicated Save Changes button
 
 ## Technologies Used
+## Feature Showcase
+
+**Modifying Current Playlists:**
+![Playlist modification demo](media/JammmingNewFeature_ezgif.gif)
+
+## Technologies Used
 
 ### Frontend
 - **React** (v19.1.0) - A JavaScript library for building user interfaces with component-based architecture
