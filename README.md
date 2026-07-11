@@ -15,7 +15,6 @@ Jammming is a full-stack music discovery and playlist management application. Us
 - Select an existing playlist and view all tracks
 - Stage add/remove edits to an existing playlist and commit them with a dedicated Save Changes button
 
-## Technologies Used
 ## Feature Showcase
 
 **Modifying Current Playlists:**
@@ -34,8 +33,9 @@ Jammming is a full-stack music discovery and playlist management application. Us
 
 ### Development Tools
 - **React Scripts** (5.0.1) - Build and development scripts
-- **Testing Library** - For component testing (@testing-library/react, @testing-library/dom, @testing-library/jest-dom)
 - **Create React App** - Project bootstrapping and configuration
+- **React Testing Library** (with Jest and jest-dom) - Component tests for Track, TrackList, SearchBar, and Playlist
+- **gh-pages** - Deployment to GitHub Pages
 
 ## Key Components & Concepts
 
@@ -119,6 +119,20 @@ The app uses **React Hooks** for state management:
 - **Spotify Integration** - Direct playlist saving to user's Spotify account
 - **Controlled Save Flow** - Existing playlist edits only persist on `SAVE CHANGES`
 - **Responsive Design** - Background image from Adobe Firefly AI
+
+## Testing
+
+Component tests are written with **React Testing Library** and **Jest**, and live alongside each component (e.g. `src/components/Track/Track.test.js`). They cover:
+
+- **Track** - renders track name/artist/album, fires `onAdd`/`onRemove` with the correct track, and hides the action button when `showAction` is false
+- **TrackList** - renders one Track per item and handles an empty list
+- **SearchBar** - disables the search button on empty input, calls `onSearch` with the typed term (button click and Enter key), and ignores whitespace-only searches
+- **Playlist** - renders the default name and tracks, fires `onNameChange` and `onSave`, and shows remove buttons for each track
+
+Run the suite with:
+```bash
+npm test
+```
 
 ## Important Note About Spotify Access
 
