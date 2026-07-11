@@ -4,6 +4,8 @@
 
 Jammming is a web application that allows users to search for songs on Spotify and create custom playlists that are saved directly to their Spotify account. Built with React and integrated with the Spotify Web API, Jammming provides an intuitive interface for discovering and organizing music.
 
+> **Note:** As of Spotify's February 2026 Web API policy changes, Development Mode apps require the app owner to hold an active Spotify Premium subscription, so the live deployment cannot currently authenticate with Spotify. The application is fully built and tested — see the [Feature Showcase](#feature-showcase) below for a demo of it running against the real API, and [Important Note About Spotify Access](#important-note-about-spotify-access) for details.
+
 ## About the Project
 
 Jammming is a full-stack music discovery and playlist management application. Users can:
@@ -149,13 +151,20 @@ The badge at the top of this README shows the current build status.
 
 ## Important Note About Spotify Access
 
-Spotify developer apps in **Development mode** are limited to the app owner and users/testers added in the Spotify Developer Dashboard. If you want broader access, ensure your app settings and Spotify account permissions are configured appropriately.
+In February 2026, Spotify made [significant changes to Web API access](https://developer.spotify.com/blog/2026-02-06-update-on-developer-access-and-platform-security) for apps in Development Mode (effective March 9, 2026 for existing apps):
+
+- The **app owner must have an active Spotify Premium subscription** for the app to access the Web API at all
+- Apps are limited to **one Client ID per developer** and **five authorized users** (added via the Spotify Developer Dashboard)
+- Search results are capped at 10 per request, and several endpoints were renamed or removed (see the [migration guide](https://developer.spotify.com/documentation/web-api/tutorials/february-2026-migration-guide))
+
+This project was built and fully functional against the Spotify API prior to these changes — the [Feature Showcase](#feature-showcase) demo shows it in action. Because the live deployment now requires the owner to hold a Premium subscription, Spotify authentication is unavailable on the hosted version. To run the app against the real API yourself, you need a Spotify Premium account and your own Client ID (see [Spotify API Setup](#spotify-api-setup) below).
 
 ## Getting Started
 
 ### Prerequisites
 - Node.js and npm installed
 - Spotify developer account (for API credentials)
+- Spotify Premium subscription (required for Web API access since Spotify's February 2026 policy change)
 
 ### Spotify API Setup
 
