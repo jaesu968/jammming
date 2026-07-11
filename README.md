@@ -1,5 +1,7 @@
 # Jammming - Spotify Playlist Creator
 
+[![CI Pipeline](https://github.com/jaesu968/jamming/actions/workflows/test.yml/badge.svg)](https://github.com/jaesu968/jamming/actions/workflows/test.yml)
+
 Jammming is a web application that allows users to search for songs on Spotify and create custom playlists that are saved directly to their Spotify account. Built with React and integrated with the Spotify Web API, Jammming provides an intuitive interface for discovering and organizing music.
 
 ## About the Project
@@ -133,6 +135,17 @@ Run the suite with:
 ```bash
 npm test
 ```
+
+### Continuous Integration
+
+The project uses **GitHub Actions** for CI. The workflow (`.github/workflows/test.yml`) runs automatically on every push and pull request to the `main` branch:
+
+1. Checks out the code
+2. Sets up Node.js (v24)
+3. Installs dependencies with `npm ci`
+4. Runs the full test suite
+
+The badge at the top of this README shows the current build status.
 
 ## Important Note About Spotify Access
 
