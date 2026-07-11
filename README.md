@@ -1,6 +1,6 @@
 # Jammming - Spotify Playlist Creator
 
-[![CI Pipeline](https://github.com/jaesu968/jamming/actions/workflows/test.yml/badge.svg)](https://github.com/jaesu968/jamming/actions/workflows/test.yml)
+[![CI Pipeline](https://github.com/jaesu968/jammming/actions/workflows/test.yml/badge.svg)](https://github.com/jaesu968/jammming/actions/workflows/test.yml)
 
 Jammming is a web application that allows users to search for songs on Spotify and create custom playlists that are saved directly to their Spotify account. Built with React and integrated with the Spotify Web API, Jammming provides an intuitive interface for discovering and organizing music.
 
