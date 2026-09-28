@@ -1,8 +1,8 @@
 // This is the javascript file that will be used to make API calls to the Spotify API
-// Search the API for track information based on search terms 
-// and save the playlist to the user's Spotify account and to the App 
+// Search the API for track information based on search terms
+// and save the playlist to the user's Spotify account and to the App
 
-// client id for spotify API 
+// client id for spotify API
 const clientId = '5fc8733a17574f7a843cc4179ba48f1b'; // the client id is used to identify the app to the Spotify API
 // Handle Spotify's redirect URI requirements: use 127.0.0.1 instead of localhost for loopback addresses
 const origin = window.location.origin.replace('http://localhost', 'http://127.0.0.1');
@@ -17,16 +17,17 @@ const scope = 'playlist-modify-public playlist-modify-private playlist-read-priv
 // code verifier and code challenge are used to authenticate with Spotify
 function generateCodeVerifier(length = 128){
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'; // possible characters to use in the code verifier
+    let randomValues = crypto.getRandomValues(new Uint8Array(length)); // cryptographically secure random bytes
     let codeVerifier = ''; // code verifier is a random string that is used to generate the code challenge
     // loop through the length of the code verifier
     for (let i = 0; i < length; i++){
-        codeVerifier += 
-        possible.charAt(Math.floor(Math.random() * possible.length)); // generate a random character from the possible characters
+        codeVerifier +=
+        possible.charAt(randomValues[i] % possible.length); // add the character at the index of the random value * possible.length)); // generate a random character from the possible characters
     }
     return codeVerifier; // return the code verifier
 }
-// use async function for the code challenge 
-// convert verifier to a SHA256 challenge 
+// use async function for the code challenge
+// convert verifier to a SHA256 challenge
 async function generateCodeChallenge(codeVerifier) {
     const encoder = new TextEncoder(); // create a new text encoder to encode the code verifier
     const data = encoder.encode(codeVerifier); // encode the code verifier
@@ -42,65 +43,61 @@ const Spotify = {
         const urlParams = new URLSearchParams(window.location.search); // get the URL parameters from the current URL
         const code = urlParams.get('code'); // get the code from the URL parameters
 
-        // add token expiration check 
+        // add token expiration check
         const tokenExpirationTime = localStorage.getItem('token_expiration'); // get the token expiration time from the local storage
         const currentTime = Date.now(); // get the current time
-        
+
 
         // check if the access token is already stored in the local storage
-        // and not expired 
+        // and not expired
         if (localStorage.getItem(tokenKey) && tokenExpirationTime && currentTime < parseInt(tokenExpirationTime)){
             return localStorage.getItem(tokenKey); // return the access token from the local storage
         }
-        // clear expired token 
+        // clear expired token
         localStorage.removeItem(tokenKey); // remove the access token from the local storage
         localStorage.removeItem('token_expiration'); // remove the token expiration time from the local storage
 
         // check if the code is already stored in the URL parameters
         // if no code is found, redirect the user to Spotify to authorize the app
         if (!code){
-            // Step 1:  redirect the user to Spotify for authorization  
+            // Step 1:  redirect the user to Spotify for authorization
             const verifier = generateCodeVerifier(); // generate the code verifier
             const challenge = await generateCodeChallenge(verifier); // generate the code challenge
             localStorage.setItem('code_verifier', verifier); // store the code verifier in the local storage
-            // check it was saved properly with logging 
-            console.log("Saving verifier before redirect: ", verifier); // log the code verifier to the console
-        // make authorization URL  
+        // make authorization URL
         const authUrl = `https://accounts.spotify.com/authorize?` +
             `client_id=${encodeURIComponent(clientId)}` +
             `&response_type=code` + // set the response type to code
             `&redirect_uri=${encodeURIComponent(redirectUri)}` +
             `&scope=${encodeURIComponent(scope)}` +
             `&code_challenge_method=S256` +
-            `&code_challenge=${challenge}`; 
-        // redirect the user to Spotify with code challenge 
+            `&code_challenge=${challenge}`;
+        // redirect the user to Spotify with code challenge
         window.location.href = authUrl; // redirect the user to the authorization URL
         return; // return nothing since the user is redirected to Spotify
         } else {
             try {
-            // Step 2:  exchange code for the access token 
+            // Step 2:  exchange code for the access token
             const verifier = localStorage.getItem('code_verifier'); // get the code verifier from the local storage
-            // a log check to see if the code verifier was saved properly
-            console.log("Retrieved verifier after redirect: ", verifier); // log the code verifier to the console
             const body = new URLSearchParams({ // create a new URLSearchParams object with the code and code verifier
                 client_id: clientId, // set the client id to the client id
                 grant_type: 'authorization_code', // set the grant type to authorization code
                 code: code, // set the code to the code from the URL parameters
                 redirect_uri: redirectUri, // set the redirect uri to the redirect uri
                 code_verifier: verifier // set the code verifier to the code verifier from the local storage}
-            }); 
+            });
 
             // make a request using await fetch to the Spotify API to exchange the code for the access token
             const response = await fetch('https://accounts.spotify.com/api/token', { // make a POST request to the Spotify API)
                 method: 'POST', // set the method to POST
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, // set the content type to application/x-www-form-urlencoded
                 body: body.toString() // set the body to the URLSearchParams object
-            }); 
+            });
             // try to get data from the response
             const data = await response.json(); // parse the response as a JSON object
             // check if the response contains an access token
-            if (data.access_token) { 
-                // store token with expiration time (typically 1 hour) 
+            if (data.access_token) {
+                // store token with expiration time (typically 1 hour)
                 localStorage.setItem(tokenKey, data.access_token); // store the access token in the local storage
                 localStorage.setItem('token_expiration', String(Date.now() + 3600000)); // store the token expiration time in the local storage)
                 window.history.replaceState({}, document.title, redirectUri); // replace the current URL with the app URL
@@ -118,35 +115,35 @@ const Spotify = {
                 return null; // return null if there is an error
             }
         }
-    },  
+    },
     // this function will be used to search for tracks and playlists in the Spotify API
-        async search(term){ 
+        async search(term){
             // use try catch block to handle errors
             try {
 
-                // check if the search term is empty 
+                // check if the search term is empty
                 if (!term || term.trim() === ''){
                     console.log('Search term is empty'); // log the error to the console
                     return []; // return an empty array if the search term is empty
                 }
 
-            // log trying to get token 
+            // log trying to get token
             console.log('Trying for access token'); // log the error to the console
         const token = await Spotify.getAccessToken(); // get the access token , used to make API calls to the Spotify API
         if (!token){
-            // trigger the authorization flow if no token 
-            console.log('No token available, redirecting to auth...'); 
+            // trigger the authorization flow if no token
+            console.log('No token available, redirecting to auth...');
             window.location.href = redirectUri; // redirect the user to the app URL
             return []; // return an empty array if there is no token
         }
-        
+
         console.log(" making search request to Spotify API"); // log the error to the console
             const response = await fetch(`https://api.spotify.com/v1/search?type=track&q=${encodeURIComponent(term)}`,{
-            headers: { // set the headers for the API call 
-                Authorization: `Bearer ${token}` // set the authorization header to the access token} 
+            headers: { // set the headers for the API call
+                Authorization: `Bearer ${token}` // set the authorization header to the access token}
             }
-        }); 
-        // check if the response status 
+        });
+        // check if the response status
         if (!response.ok) {
             throw new Error('Spotify search failed'); // throw an error if the response is not ok
         }
@@ -157,19 +154,19 @@ const Spotify = {
         if (!jsonResponse.tracks){
             console.log('No tracks found'); // log the error to the console
             return []; // return an empty array if there are no tracks
-        } // if no tracks are found, return an empty array 
+        } // if no tracks are found, return an empty array
         // return the tracks and associated data in an array of objects
-            return jsonResponse.tracks.items.map(track => ({ // map the tracks to an array of objects   
+            return jsonResponse.tracks.items.map(track => ({ // map the tracks to an array of objects
                 id: track.id, // set the id to the track id
                 name: track.name, // set the name to the track name
                 artist: track.artists[0].name, // set the artist to the first artist in the track
                 album: track.album.name, // set the album to the album name
-                uri: track.uri // set the uri to the track uri 
-            })); // return the array of objects 
+                uri: track.uri // set the uri to the track uri
+            })); // return the array of objects
     } catch (error) {
-        console.error('Spotify search error:', error); // log the error to the console 
+        console.error('Spotify search error:', error); // log the error to the console
         if (error.message.includes('Failed to fetch')){
-            console.error('Network error - check your internet connection'); 
+            console.error('Network error - check your internet connection');
         }
         return []; // return an empty array if an error occurs
     }
@@ -181,15 +178,15 @@ async savePlaylist(name, trackUris) {
             return;
         }
 
-        const token = await Spotify.getAccessToken(); 
+        const token = await Spotify.getAccessToken();
         if (!token) {
             window.location.href = redirectUri;
             return; // return if there is no token
         }
 
         const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
-        
-        try { 
+
+        try {
             const userResponse = await fetch('https://api.spotify.com/v1/me', { headers });
 
             if (!userResponse.ok) throw new Error('Failed to get user info from Spotify');
@@ -199,7 +196,7 @@ async savePlaylist(name, trackUris) {
                 method: 'POST',
                 headers,
                 body: JSON.stringify({ name })
-            }); 
+            });
 
             if (!playlistResponse.ok) throw new Error('Failed to create playlist');
             const playlistData = await playlistResponse.json();
@@ -209,14 +206,14 @@ async savePlaylist(name, trackUris) {
                 headers,
                 body: JSON.stringify({ uris: trackUris })
             });
-            
+
             if (!trackResponse.ok) throw new Error('Failed to add tracks to playlist');
         } catch (error) {
             console.error('Spotify playlist error:', error);
         }
-    }, 
+    },
     // end of savePlaylist function
-    // function to get the user's playlists from the Spotify API 
+    // function to get the user's playlists from the Spotify API
     async getUserPlaylists() {
         const token = await Spotify.getAccessToken();
         if (!token) {
@@ -240,13 +237,13 @@ async savePlaylist(name, trackUris) {
             console.error('Spotify playlist error:', error);
             return []; // return an empty array if an error occurs
         }
-    }, 
+    },
     // end of getUserPlaylists function
     // get selected playlist's tracks from the Spotify API
     async getPlaylistTracks(playlistId) {
         const token = await Spotify.getAccessToken();
         if (!token) {
-            window.location.href = redirectUri; 
+            window.location.href = redirectUri;
             return []; // return an empty array if there is no token
         }
         try {
@@ -261,13 +258,13 @@ async savePlaylist(name, trackUris) {
                 items = items.concat(data.items);
                 url = data.next; // null when no more pages
             }
-            return items.map(item => ({ // map the tracks to an array of objects   
+            return items.map(item => ({ // map the tracks to an array of objects
                 id: item.track.id, // set the id to the track id
                 name: item.track.name, // set the name to the track name
                 artist: item.track.artists[0].name, // set the artist to the first artist in the track
                 album: item.track.album.name, // set the album to the album name
-                uri: item.track.uri // set the uri to the track uri 
-            })); // return the array of objects 
+                uri: item.track.uri // set the uri to the track uri
+            })); // return the array of objects
         } catch (error) {
             console.error('Spotify playlist tracks error:', error);
             return []; // return an empty array if an error occurs
