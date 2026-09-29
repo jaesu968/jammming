@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "./static/css/main.ff3f2168.css",
-    "main.js": "./static/js/main.9e43817d.js",
+    "main.js": "./static/js/main.05a298bb.js",
     "static/media/FireflyForestStereo.jpg": "./static/media/FireflyForestStereo.2a0f92a4bbbffeafe21e.jpg",
     "index.html": "./index.html",
     "main.ff3f2168.css.map": "./static/css/main.ff3f2168.css.map",
-    "main.9e43817d.js.map": "./static/js/main.9e43817d.js.map"
+    "main.05a298bb.js.map": "./static/js/main.05a298bb.js.map"
   },
   "entrypoints": [
     "static/css/main.ff3f2168.css",
-    "static/js/main.9e43817d.js"
+    "static/js/main.05a298bb.js"
   ]
 }
